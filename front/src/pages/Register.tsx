@@ -67,9 +67,10 @@ const Register: React.FC = () => {
     try {
       await register(formData.name.trim(), formData.email, formData.password);
       navigate('/');
-    } catch (error: any) {
-      setErrors({ 
-        general: error.response?.data?.message || 'Erro ao criar conta. Tente novamente.' 
+    } catch (error: unknown) {
+      const axiosError = error as { response?: { data?: { message?: string } } };
+      setErrors({
+        general: axiosError.response?.data?.message || 'Erro ao criar conta. Tente novamente.'
       });
     } finally {
       setIsLoading(false);

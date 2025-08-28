@@ -50,9 +50,10 @@ const Login: React.FC = () => {
     try {
       await login(formData.email, formData.password);
       navigate('/');
-    } catch (error: any) {
-      setErrors({ 
-        general: error.response?.data?.message || 'Erro ao fazer login. Tente novamente.' 
+    } catch (error: unknown) {
+      const axiosError = error as { response?: { data?: { message?: string } } };
+      setErrors({
+        general: axiosError.response?.data?.message || 'Erro ao fazer login. Tente novamente.'
       });
     } finally {
       setIsLoading(false);

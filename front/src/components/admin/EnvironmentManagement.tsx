@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { adminApi, publicApi } from '../../services/api';
-import { Ambiente, Subambiente } from '../../types';
+import { Ambiente } from '../../types';
 
 const EnvironmentManagement: React.FC = () => {
   const [ambientes, setAmbientes] = useState<Ambiente[]>([]);

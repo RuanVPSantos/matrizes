@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { User, AuthResponse } from '../types';
+import { User } from '../types';
 import { authApi } from '../services/api';
 
 interface AuthContextType {
@@ -28,7 +28,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     if (token && userData) {
       try {
         setUser(JSON.parse(userData));
-      } catch (error) {
+      } catch {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
       }
@@ -38,26 +38,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }, []);
 
   const login = async (email: string, password: string): Promise<void> => {
-    try {
-      const response = await authApi.login({ email, password });
-      const { token, ...userData } = response.data;
-      
-      localStorage.setItem('token', token);
-      localStorage.setItem('user', JSON.stringify(userData));
-      setUser(userData);
-    } catch (error) {
-      throw error;
-    }
+    const response = await authApi.login({ email, password });
+    const { token, ...userData } = response.data;
+
+    localStorage.setItem('token', token);
+    localStorage.setItem('user', JSON.stringify(userData));
+    setUser(userData);
   };
 
   const register = async (name: string, email: string, password: string): Promise<void> => {
-    try {
-      await authApi.register({ name, email, password });
-      // Após registro, fazer login automaticamente
-      await login(email, password);
-    } catch (error) {
-      throw error;
-    }
+    await authApi.register({ name, email, password });
+    // Após registro, fazer login automaticamente
+    await login(email, password);
   };
 
   const logout = (): void => {
@@ -82,6 +74,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   );
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = (): AuthContextType => {
   const context = useContext(AuthContext);
   if (context === undefined) {

@@ -112,21 +112,25 @@ export const mockApi = {
     },
 
     addFavorite: async (artigoId: number): Promise<{ data: { message: string } }> => {
+      void artigoId; // Parameter intentionally unused in mock
       await delay();
       return { data: { message: 'Artigo adicionado aos favoritos' } };
     },
 
     removeFavorite: async (artigoId: number): Promise<{ data: { message: string } }> => {
+      void artigoId; // Parameter intentionally unused in mock
       await delay();
       return { data: { message: 'Artigo removido dos favoritos' } };
     },
 
     markBlockAsRead: async (blockId: number): Promise<{ data: { message: string } }> => {
+      void blockId; // Parameter intentionally unused in mock
       await delay(200);
       return { data: { message: 'Bloco marcado como lido' } };
     },
 
     getReadings: async (artigoId: number): Promise<{ data: number[] }> => {
+      void artigoId; // Parameter intentionally unused in mock
       await delay();
       // Mock some read blocks
       return { data: [1, 2] };
@@ -159,6 +163,7 @@ export const mockApi = {
     },
 
     deleteAmbiente: async (id: number): Promise<{ data: { message: string } }> => {
+      void id; // Parameter intentionally unused in mock
       await delay();
       return { data: { message: 'Ambiente removido com sucesso' } };
     },
@@ -188,6 +193,7 @@ export const mockApi = {
     },
 
     deleteSubambiente: async (id: number): Promise<{ data: { message: string } }> => {
+      void id; // Parameter intentionally unused in mock
       await delay();
       return { data: { message: 'Subambiente removido com sucesso' } };
     },
@@ -217,6 +223,7 @@ export const mockApi = {
     },
 
     deleteArtigo: async (id: number): Promise<{ data: { message: string } }> => {
+      void id; // Parameter intentionally unused in mock
       await delay();
       return { data: { message: 'Artigo removido com sucesso' } };
     },
@@ -268,14 +275,15 @@ export const mockApi = {
       return { data: updatedBloco };
     },
 
-    deleteBloco: async (_id: number): Promise<{ data: { message: string } }> => {
-
+    deleteBloco: async (id: number): Promise<{ data: { message: string } }> => {
+      void id; // Parameter intentionally unused in mock
       await delay();
       return { data: { message: 'Bloco removido com sucesso' } };
     },
 
-    reorderBlocos: async (_artigoId: number, _orderList: number[]): Promise<{ data: { message: string } }> => {
-
+    reorderBlocos: async (artigoId: number, orderList: number[]): Promise<{ data: { message: string } }> => {
+      void artigoId; // Parameter intentionally unused in mock
+      void orderList; // Parameter intentionally unused in mock
       await delay();
       return { data: { message: 'Blocos reordenados com sucesso' } };
     },

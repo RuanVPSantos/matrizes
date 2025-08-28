@@ -1,18 +1,51 @@
 version: '3.8'
 
 services:
-  back:
-    build: ./back
+  # Backend API
+  backend:
+    build:
+      context: ./back
+      dockerfile: Dockerfile
+    container_name: matrizes_backend
+    restart: unless-stopped
+    env_file:
+      - ./back/.env
+    environment:
+      - NODE_ENV=development
+      - PORT=3000
     ports:
       - "3000:3000"
-    volumes:
-      - .:/app
-    env_file:
-      - .env
-    depends_on:
-      - db
+    networks:
+      - matrizes_network
+    healthcheck:
+      test: ["CMD", "node", "healthcheck.js"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
-  front:
-    build: ./front
+  # Frontend (React + Nginx)
+  frontend:
+    build:
+      context: ./front
+      dockerfile: Dockerfile
+    container_name: matrizes_frontend
+    restart: unless-stopped
+    env_file:
+      - ./front/.env
     ports:
-      - "5173:5173"
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - matrizes_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+networks:
+  matrizes_network:
+    driver: bridge
