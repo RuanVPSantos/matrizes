@@ -1,0 +1,103 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int       @id @default(autoincrement())
+  name      String
+  email     String    @unique
+  password  String
+  role      Role      @default(USER)
+  blocked   Boolean   @default(false)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  favorites Favorite[]
+  readings  Reading[]
+}
+
+enum Role {
+  ADMIN
+  USER
+}
+
+model Ambiente {
+  id           Int           @id @default(autoincrement())
+  name         String
+  description  String?
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+
+  subambientes Subambiente[]
+}
+
+model Subambiente {
+  id          Int        @id @default(autoincrement())
+  name        String
+  description String?
+  ambienteId  Int
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  ambiente    Ambiente   @relation(fields: [ambienteId], references: [id], onDelete: Cascade)
+  artigos     Artigo[]
+}
+
+model Artigo {
+  id            Int        @id @default(autoincrement())
+  title         String
+  description   String?
+  subambienteId Int
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  subambiente   Subambiente @relation(fields: [subambienteId], references: [id], onDelete: Cascade)
+  blocks        Bloco[]
+  favorites     Favorite[]
+}
+
+model Bloco {
+  id        Int        @id @default(autoincrement())
+  type      BlocoType
+  order     Int
+  content   Json
+  artigoId  Int
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  artigo    Artigo     @relation(fields: [artigoId], references: [id], onDelete: Cascade)
+  readings  Reading[]
+}
+
+enum BlocoType {
+  TEXTO
+  IMAGEM
+  VIDEO
+}
+
+model Favorite {
+  id       Int    @id @default(autoincrement())
+  userId   Int
+  artigoId Int
+
+  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  artigo   Artigo @relation(fields: [artigoId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, artigoId])
+}
+
+model Reading {
+  id      Int    @id @default(autoincrement())
+  userId  Int
+  blocoId Int
+
+  user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bloco   Bloco  @relation(fields: [blocoId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, blocoId])
+}
