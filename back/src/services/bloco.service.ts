@@ -11,8 +11,16 @@ export async function createBloco(artigoId: number, data: CreateBloco) {
     throw new Error("Artigo not found");
   }
 
+  // If order is not provided, assign the next available order
+  let order = data.order;
+  if (order === undefined || order === null) {
+    const maxOrder = await blocoRepository.getMaxOrder(artigoId);
+    order = maxOrder + 1;
+  }
+
   const bloco = await blocoRepository.create({
     ...data,
+    order,
     artigoId
   });
   return bloco.toResponse();
@@ -38,12 +46,18 @@ export async function deleteBloco(id: number) {
   return { message: "Bloco deleted successfully" };
 }
 
-export async function reorderBlocos(artigoId: number, orderList: { id: number; order: number }[]) {
+export async function reorderBlocos(artigoId: number, orderList: number[]) {
   const artigo = await artigoRepository.findById(artigoId);
   if (!artigo) {
     throw new Error("Artigo not found");
   }
 
-  await blocoRepository.reorderBlocos(artigoId, orderList);
+  // Convert array of IDs to array of objects with id and order properties
+  const orderObjects = orderList.map((id, index) => ({
+    id,
+    order: index + 1
+  }));
+
+  await blocoRepository.reorderBlocos(artigoId, orderObjects);
   return { message: "Blocos reordered successfully" };
 }

@@ -6,8 +6,14 @@ const prisma = new PrismaClient();
 
 export class BlocoRepository {
   async create(data: CreateBloco): Promise<Bloco> {
+    // Ensure order is always provided as a number for Prisma
+    const blocoData = {
+      ...data,
+      order: data.order ?? 0  // Default to 0 if order is undefined
+    };
+
     const bloco = await prisma.bloco.create({
-      data
+      data: blocoData
     });
     return new Bloco(
       bloco.id,
@@ -25,7 +31,7 @@ export class BlocoRepository {
       where: { id }
     });
     if (!bloco) return null;
-    
+
     return new Bloco(
       bloco.id,
       bloco.type,
@@ -84,5 +90,16 @@ export class BlocoRepository {
         })
       )
     );
+  }
+
+  async getMaxOrder(artigoId: number): Promise<number> {
+    const result = await prisma.bloco.aggregate({
+      where: { artigoId },
+      _max: {
+        order: true
+      }
+    });
+
+    return result._max.order || 0;
   }
 }

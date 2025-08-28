@@ -1,3 +1,5 @@
+import { Bloco } from "./bloco.model";
+
 export class Artigo {
   constructor(
     public id: number,
@@ -17,7 +19,19 @@ export class Artigo {
       subambienteId: this.subambienteId,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt,
-      blocks: this.blocks
+      blocks: this.blocks ? this.blocks.map(block => {
+        // Convert Prisma block to Bloco model and then to response
+        const blocoModel = new Bloco(
+          block.id,
+          block.type,
+          block.order,
+          block.content,
+          block.artigoId,
+          block.createdAt,
+          block.updatedAt
+        );
+        return blocoModel.toResponse();
+      }) : undefined
     };
   }
 }

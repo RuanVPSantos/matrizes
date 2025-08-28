@@ -6,7 +6,7 @@ export const createBlocoSchema = z.object({
   }),
   body: z.object({
     type: z.enum(["TEXTO", "IMAGEM", "VIDEO"]),
-    order: z.number().int().min(0),
+    order: z.number().int().min(0).optional(),
     content: z.any()
   })
 });
@@ -33,9 +33,6 @@ export const reorderBlocosSchema = z.object({
     artigoId: z.string().transform(val => parseInt(val))
   }),
   body: z.object({
-    orderList: z.array(z.object({
-      id: z.number().int(),
-      order: z.number().int().min(0)
-    }))
+    orderList: z.array(z.number().int())
   })
 });

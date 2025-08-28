@@ -4,6 +4,7 @@ import { createArtigoSchema, updateArtigoSchema, deleteArtigoSchema, listArtigos
 import { authMiddleware, adminMiddleware } from "../middlewares/auth.middleware";
 import { zodToFastify } from "../../utils/zod-fastify";
 
+
 export default async function artigoRoutes(fastify: FastifyInstance) {
   // Public routes
   fastify.get(
@@ -56,7 +57,10 @@ export default async function artigoRoutes(fastify: FastifyInstance) {
                     id: { type: "number" },
                     type: { type: "string", enum: ["TEXTO", "IMAGEM", "VIDEO"] },
                     order: { type: "number" },
-                    content: { type: "object" },
+                    content: { 
+                      type: "object",
+                      additionalProperties: true
+                    },
                     artigoId: { type: "number" },
                     createdAt: { type: "string" },
                     updatedAt: { type: "string" }

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { BookOpen, Users, FileText } from 'lucide-react';
 import { publicApi } from '../../services/api';
@@ -14,26 +14,7 @@ const VitrailLayout: React.FC = () => {
   const [ambientes, setAmbientes] = useState<Ambiente[]>([]);
   const [segments, setSegments] = useState<VitrailSegment[]>([]);
 
-  useEffect(() => {
-    loadAmbientes();
-  }, []);
-
-  useEffect(() => {
-    if (ambientes.length > 0) {
-      generateSegments();
-    }
-  }, [ambientes]);
-
-  const loadAmbientes = async () => {
-    try {
-      const response = await publicApi.getAmbientes();
-      setAmbientes(response.data);
-    } catch (error) {
-      console.error('Erro ao carregar ambientes:', error);
-    }
-  };
-
-  const generateSegments = () => {
+  const generateSegments = useCallback(() => {
     const colors = [
       'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
       'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
@@ -45,17 +26,18 @@ const VitrailLayout: React.FC = () => {
       'linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)',
     ];
 
-    const newSegments: VitrailSegment[] = ambientes.map((ambiente, index) => {
+    const newSegments: VitrailSegment[] = ambientes.map((ambiente) => {
       const totalAmbientes = ambientes.length;
       let clipPath: string;
       
       if (totalAmbientes === 1) {
         clipPath = 'polygon(0 0, 100% 0, 100% 100%, 0 100%)';
       } else if (totalAmbientes === 2) {
-        clipPath = index === 0 
+        clipPath = ambientes.indexOf(ambiente) === 0 
           ? 'polygon(0 0, 100% 0, 50% 100%, 0 100%)'
           : 'polygon(50% 100%, 100% 0, 100% 100%)';
       } else if (totalAmbientes === 3) {
+        const index = ambientes.indexOf(ambiente);
         const clipPaths = [
           'polygon(0 0, 100% 0, 50% 50%, 0 100%)',
           'polygon(50% 50%, 100% 0, 100% 100%)',
@@ -63,6 +45,7 @@ const VitrailLayout: React.FC = () => {
         ];
         clipPath = clipPaths[index];
       } else if (totalAmbientes === 4) {
+        const index = ambientes.indexOf(ambiente);
         const clipPaths = [
           'polygon(0 0, 50% 0, 50% 50%, 0 50%)',
           'polygon(50% 0, 100% 0, 100% 50%, 50% 50%)',
@@ -72,6 +55,7 @@ const VitrailLayout: React.FC = () => {
         clipPath = clipPaths[index];
       } else {
         // Para mais de 4 ambientes, criar divisões diagonais complexas
+        const index = ambientes.indexOf(ambiente);
         const angle = (index * 360 / totalAmbientes) * (Math.PI / 180);
         const x1 = 50 + 50 * Math.cos(angle);
         const y1 = 50 + 50 * Math.sin(angle);
@@ -84,7 +68,7 @@ const VitrailLayout: React.FC = () => {
       return {
         ambiente,
         style: {
-          background: colors[index % colors.length],
+          background: colors[ambientes.indexOf(ambiente) % colors.length],
           clipPath,
         },
         clipPath,
@@ -92,11 +76,33 @@ const VitrailLayout: React.FC = () => {
     });
 
     setSegments(newSegments);
+  }, [ambientes]);
+
+  useEffect(() => {
+    loadAmbientes();
+  }, []);
+
+  useEffect(() => {
+    if (ambientes.length > 0) {
+      generateSegments();
+    }
+  }, [ambientes, generateSegments]);
+
+  const loadAmbientes = async () => {
+    try {
+      const response = await publicApi.getAmbientes();
+      setAmbientes(response.data);
+    } catch (error) {
+      console.error('Erro ao carregar ambientes:', error);
+    }
   };
 
   return (
     <div className="relative w-full h-screen overflow-hidden">
-      {segments.map((segment, index) => (
+      {/* Background pattern */}
+      <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900" />
+
+      {segments.map((segment) => (
         <Link
           key={segment.ambiente.id}
           to={`/ambientes/${segment.ambiente.id}`}

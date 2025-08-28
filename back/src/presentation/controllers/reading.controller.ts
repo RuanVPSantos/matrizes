@@ -7,7 +7,7 @@ export async function markBlocoAsReadController(request: FastifyRequest, reply: 
       return reply.status(401).send({ message: 'User not authenticated' });
     }
     const { blocoId } = request.body as any;
-    const result = await readingService.markBlocoAsRead(request.user.id, blocoId);
+    const result = await readingService.markBlocoAsRead(Number(request.user.id), Number(blocoId));
     reply.status(200).send(result);
   } catch (error) {
     if (error instanceof Error) {
@@ -24,7 +24,7 @@ export async function listReadBlocosController(request: FastifyRequest, reply: F
       return reply.status(401).send({ message: 'User not authenticated' });
     }
     const { artigoId } = request.params as any;
-    const readBlocos = await readingService.listReadBlocos(request.user.id, artigoId);
+    const readBlocos = await readingService.listReadBlocos(Number(request.user.id), Number(artigoId));
     reply.status(200).send(readBlocos);
   } catch (error) {
     if (error instanceof Error) {

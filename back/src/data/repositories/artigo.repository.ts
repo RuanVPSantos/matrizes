@@ -1,6 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import { CreateArtigo, UpdateArtigo } from "../interfaces/artigo.interface";
 import { Artigo } from "../models/artigo.model";
+import { Bloco } from "../models/bloco.model";
 
 const prisma = new PrismaClient();
 
@@ -29,7 +30,21 @@ export class ArtigoRepository {
       }
     });
     if (!artigo) return null;
-    
+
+
+    const blocos: Bloco[] = [];
+    artigo.blocks.forEach(block => {
+      blocos.push(new Bloco(
+        block.id,
+        block.type,
+        block.order,
+        block.content,
+        block.artigoId,
+        block.createdAt,
+        block.updatedAt
+      ));
+    });
+
     return new Artigo(
       artigo.id,
       artigo.title,
@@ -37,7 +52,7 @@ export class ArtigoRepository {
       artigo.subambienteId,
       artigo.createdAt,
       artigo.updatedAt,
-      artigo.blocks
+      blocos
     );
   }
 
@@ -64,7 +79,12 @@ export class ArtigoRepository {
   async update(id: number, data: UpdateArtigo): Promise<Artigo> {
     const artigo = await prisma.artigo.update({
       where: { id },
-      data
+      data,
+      include: {
+        blocks: {
+          orderBy: { order: 'asc' }
+        }
+      }
     });
     return new Artigo(
       artigo.id,
@@ -72,7 +92,8 @@ export class ArtigoRepository {
       artigo.description,
       artigo.subambienteId,
       artigo.createdAt,
-      artigo.updatedAt
+      artigo.updatedAt,
+      artigo.blocks
     );
   }
 

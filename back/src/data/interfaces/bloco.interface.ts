@@ -2,7 +2,7 @@ import { BlocoType } from "@prisma/client";
 
 export interface CreateBloco {
   type: BlocoType;
-  order: number;
+  order?: number;
   content: any;
   artigoId: number;
 }

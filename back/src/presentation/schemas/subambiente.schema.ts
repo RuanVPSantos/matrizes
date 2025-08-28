@@ -31,3 +31,9 @@ export const listSubambientesSchema = z.object({
     ambienteId: z.string().transform(val => parseInt(val))
   })
 });
+
+export const listSubambientesByIdSchema = z.object({
+  params: z.object({
+    id: z.string().transform(val => parseInt(val))
+  })
+});

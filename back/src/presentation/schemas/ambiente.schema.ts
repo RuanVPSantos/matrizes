@@ -28,3 +28,10 @@ export const getAmbienteSchema = z.object({
     id: z.string().transform(val => parseInt(val))
   })
 });
+
+export const listAmbientesByIdSchema = z.object({
+  params: z.object({
+    id: z.string().transform(val => parseInt(val))
+  })
+});
+

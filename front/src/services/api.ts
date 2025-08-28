@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { mockApi } from './mockApi';
-import { AuthResponse, LoginRequest, RegisterRequest, HeaderData, Ambiente, Subambiente, Artigo, User } from '../types';
+import { AuthResponse, LoginRequest, RegisterRequest, HeaderData, Ambiente, Subambiente, Artigo, User, Block } from '../types';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 const USE_MOCK = import.meta.env.VITE_USE_MOCK === 'true';
@@ -46,6 +46,7 @@ export const authApi = USE_MOCK ? mockApi.auth : {
 export const publicApi = USE_MOCK ? mockApi.public : {
   getHeader: () => api.get<HeaderData[]>('/header'),
   getAmbientes: () => api.get<Ambiente[]>('/ambientes'),
+  getAmbiente: (id: number) => api.get<Ambiente>(`/ambientes/${id}`),
   getSubambientes: (ambienteId: number) => api.get<Subambiente[]>(`/ambientes/${ambienteId}/subambientes`),
   getArtigos: (subambienteId: number) => api.get<Artigo[]>(`/subambientes/${subambienteId}/artigos`),
   getArtigo: (id: number) => api.get<Artigo>(`/artigos/${id}`),
@@ -77,6 +78,12 @@ export const adminApi = USE_MOCK ? mockApi.admin : {
     api.post(`/subambientes/${subambienteId}/artigos`, data),
   updateArtigo: (id: number, data: Partial<Artigo>) => api.put(`/artigos/${id}`, data),
   deleteArtigo: (id: number) => api.delete(`/artigos/${id}`),
+  
+  // Blocos
+  createBloco: (artigoId: number, data: Partial<Block>) => api.post(`/artigos/${artigoId}/blocos`, data),
+  updateBloco: (id: number, data: Partial<Block>) => api.put(`/blocos/${id}`, data),
+  deleteBloco: (id: number) => api.delete(`/blocos/${id}`),
+  reorderBlocos: (artigoId: number, orderList: number[]) => api.patch(`/artigos/${artigoId}/blocos/reorder`, { orderList }),
   
   // Usuários
   getUsers: () => api.get<User[]>('/users'),

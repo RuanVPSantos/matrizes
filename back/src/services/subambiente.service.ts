@@ -47,3 +47,12 @@ export async function listSubambientes(ambienteId: number) {
   const subambientes = await subambienteRepository.findByAmbienteId(ambienteId);
   return subambientes.map(subambiente => subambiente.toResponse());
 }
+
+export async function listSubambientesById(id: number) {
+  const subambiente = await subambienteRepository.findById(id);
+  if (!subambiente) {
+    throw new Error("Subambiente not found");
+  }
+
+  return subambiente.toResponse();
+}

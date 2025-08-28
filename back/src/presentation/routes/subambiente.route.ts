@@ -1,6 +1,6 @@
 import { FastifyInstance } from "fastify";
-import { createSubambienteController, updateSubambienteController, deleteSubambienteController, listSubambientesController } from "../controllers/subambiente.controller";
-import { createSubambienteSchema, updateSubambienteSchema, deleteSubambienteSchema, listSubambientesSchema } from "../schemas/subambiente.schema";
+import { createSubambienteController, updateSubambienteController, deleteSubambienteController, listSubambientesController, listSubambientesByIdController } from "../controllers/subambiente.controller";
+import { createSubambienteSchema, updateSubambienteSchema, deleteSubambienteSchema, listSubambientesSchema, listSubambientesByIdSchema } from "../schemas/subambiente.schema";
 import { authMiddleware, adminMiddleware } from "../middlewares/auth.middleware";
 import { zodToFastify } from "../../utils/zod-fastify";
 
@@ -40,5 +40,13 @@ export default async function subambienteRoutes(fastify: FastifyInstance) {
       schema: zodToFastify(deleteSubambienteSchema)
     },
     deleteSubambienteController
+  );
+
+  fastify.get(
+    "/subambientes/:id",
+    {
+      schema: zodToFastify(listSubambientesByIdSchema)
+    },
+    listSubambientesByIdController
   );
 }

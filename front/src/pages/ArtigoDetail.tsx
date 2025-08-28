@@ -13,6 +13,7 @@ const ArtigoDetail: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [isFavorited, setIsFavorited] = useState(false);
   const [readBlocks, setReadBlocks] = useState<number[]>([]);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (id) {
@@ -25,10 +26,14 @@ const ArtigoDetail: React.FC = () => {
 
   const loadArtigo = async (artigoId: number) => {
     try {
+      console.log('Carregando artigo com ID:', artigoId);
+      setLoading(true);
       const response = await publicApi.getArtigo(artigoId);
+      console.log('Resposta da API:', response);
       setArtigo(response.data);
     } catch (error) {
       console.error('Erro ao carregar artigo:', error);
+      setError('Erro ao carregar artigo');
     } finally {
       setLoading(false);
     }
@@ -78,24 +83,26 @@ const ArtigoDetail: React.FC = () => {
     }`;
 
     switch (block.type) {
-      case 'TEXTO':
+      case 'TEXTO': {
         const textContent = block.content as TextBlock;
-        const fontSize = {
-          small: 'text-sm',
-          medium: 'text-base',
-          large: 'text-lg',
-          xlarge: 'text-xl'
-        }[textContent.style.fontSize];
+
+        // Verificação de segurança para propriedades style
+        const style = textContent.style || {};
+        const fontSize = style.fontSize === 'small' ? 'text-sm' :
+                        style.fontSize === 'medium' ? 'text-xl' :
+                        style.fontSize === 'large' ? 'text-4xl' :
+                        style.fontSize === 'xlarge' ? 'text-7xl' :
+                        'text-base'; // default
 
         const textAlign = {
           left: 'text-left',
           center: 'text-center',
           right: 'text-right',
           justify: 'text-justify'
-        }[textContent.style.textAlign];
+        }[style.textAlign || 'left'];
 
-        const fontWeight = textContent.style.fontWeight === 'bold' ? 'font-bold' : 'font-normal';
-        const fontStyle = textContent.style.fontStyle === 'italic' ? 'italic' : 'not-italic';
+        const fontWeight = style.fontWeight === 'bold' ? 'font-bold' : 'font-normal';
+        const fontStyle = style.fontStyle === 'italic' ? 'italic' : 'not-italic';
 
         return (
           <div
@@ -103,12 +110,12 @@ const ArtigoDetail: React.FC = () => {
             className={`${blockClass} mb-6 p-4 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors`}
             onClick={() => markBlockAsRead(block.id)}
             style={{
-              color: textContent.style.color,
-              backgroundColor: textContent.style.backgroundColor || 'transparent'
+              color: style.color || '#000000',
+              backgroundColor: style.backgroundColor || 'transparent'
             }}
           >
             <p className={`${fontSize} ${textAlign} ${fontWeight} ${fontStyle} leading-relaxed`}>
-              {textContent.text}
+              {textContent.text || 'Conteúdo não disponível'}
             </p>
             {isAuthenticated && (
               <div className="mt-2 flex items-center space-x-2 text-xs text-gray-500">
@@ -118,22 +125,46 @@ const ArtigoDetail: React.FC = () => {
             )}
           </div>
         );
+      }
 
-      case 'IMAGEM':
+      case 'IMAGEM': {
         const imageContent = block.content as ImageBlock;
+        const imageStyle = imageContent.style || {};
+
         return (
           <div
             key={block.id}
             className={`${blockClass} mb-6 cursor-pointer`}
             onClick={() => markBlockAsRead(block.id)}
           >
-            <div className={`${imageContent.style?.textAlign === 'center' ? 'text-center' : 'text-left'}`}>
-              <img
-                src={imageContent.url}
-                alt={imageContent.alt}
-                className="rounded-lg shadow-md hover:shadow-lg transition-shadow"
-                style={{ width: imageContent.style?.width || 'auto' }}
-              />
+            <div className={`${imageStyle.textAlign === 'center' ? 'text-center' : 'text-left'}`}>
+              {imageContent.url ? (
+                <img
+                  src={imageContent.url}
+                  alt={imageContent.alt || 'Imagem'}
+                  className="rounded-lg shadow-md hover:shadow-lg transition-shadow max-w-full h-auto"
+                  style={{
+                    width: imageStyle.width || '100%',
+                    maxWidth: '800px'
+                  }}
+                  onLoad={() => console.log('Imagem carregada com sucesso:', imageContent.url)}
+                  onError={(e) => {
+                    console.error('❌ Erro ao carregar imagem:', imageContent.url);
+                    console.error('Block ID:', block.id);
+                    console.error('Block data completo:', imageContent);
+                    console.error('Event error:', e);
+                    e.currentTarget.style.display = 'none';
+                    e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                  }}
+                />
+              ) : null}
+              <div className={`hidden text-center p-8 bg-gray-100 rounded-lg ${!imageContent.url ? '' : 'hidden'}`}>
+                <div className="text-4xl mb-2">🖼️</div>
+                <p className="text-gray-500">Imagem não disponível</p>
+                {imageContent.url && (
+                  <p className="text-xs text-gray-400 mt-2 break-all">URL: {imageContent.url}</p>
+                )}
+              </div>
               {imageContent.caption && (
                 <p className="mt-2 text-sm text-gray-600 italic">{imageContent.caption}</p>
               )}
@@ -146,9 +177,11 @@ const ArtigoDetail: React.FC = () => {
             )}
           </div>
         );
+      }
 
-      case 'VIDEO':
+      case 'VIDEO': {
         const videoContent = block.content as VideoBlock;
+
         return (
           <div
             key={block.id}
@@ -157,7 +190,7 @@ const ArtigoDetail: React.FC = () => {
           >
             <div className="bg-gray-100 rounded-lg p-8 text-center">
               <div className="text-4xl mb-4">🎥</div>
-              <h3 className="text-lg font-semibold mb-2">{videoContent.title}</h3>
+              <h3 className="text-lg font-semibold mb-2">{videoContent.title || 'Vídeo'}</h3>
               <p className="text-gray-600 mb-4">Vídeo não disponível no modo demonstração</p>
               {videoContent.duration && (
                 <div className="flex items-center justify-center space-x-1 text-sm text-gray-500">
@@ -174,6 +207,7 @@ const ArtigoDetail: React.FC = () => {
             )}
           </div>
         );
+      }
 
       default:
         return null;
@@ -188,13 +222,35 @@ const ArtigoDetail: React.FC = () => {
     );
   }
 
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-red-600 mb-4">Erro</h2>
+          <p className="text-gray-600 mb-6">{error}</p>
+          <Link
+            to="/"
+            className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Voltar ao início
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
   if (!artigo) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Artigo não encontrado</h2>
-          <Link to="/">
-            <Button variant="outline">Voltar ao início</Button>
+          <Link
+            to="/"
+            className="inline-flex items-center px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Voltar ao início
           </Link>
         </div>
       </div>

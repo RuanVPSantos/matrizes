@@ -5,7 +5,7 @@ export async function createBlocoController(request: FastifyRequest, reply: Fast
   try {
     const { artigoId } = request.params as any;
     const createData = request.body as any;
-    const bloco = await blocoService.createBloco(artigoId, createData);
+    const bloco = await blocoService.createBloco(Number(artigoId), createData);
     reply.status(201).send(bloco);
   } catch (error) {
     if (error instanceof Error) {
@@ -20,7 +20,7 @@ export async function updateBlocoController(request: FastifyRequest, reply: Fast
   try {
     const { id } = request.params as any;
     const updateData = request.body as any;
-    const bloco = await blocoService.updateBloco(id, updateData);
+    const bloco = await blocoService.updateBloco(Number(id), updateData);
     reply.status(200).send(bloco);
   } catch (error) {
     if (error instanceof Error) {
@@ -34,7 +34,7 @@ export async function updateBlocoController(request: FastifyRequest, reply: Fast
 export async function deleteBlocoController(request: FastifyRequest, reply: FastifyReply) {
   try {
     const { id } = request.params as any;
-    const result = await blocoService.deleteBloco(id);
+    const result = await blocoService.deleteBloco(Number(id));
     reply.status(200).send(result);
   } catch (error) {
     if (error instanceof Error) {
@@ -49,7 +49,7 @@ export async function reorderBlocosController(request: FastifyRequest, reply: Fa
   try {
     const { artigoId } = request.params as any;
     const { orderList } = request.body as any;
-    const result = await blocoService.reorderBlocos(artigoId, orderList);
+    const result = await blocoService.reorderBlocos(Number(artigoId), orderList);
     reply.status(200).send(result);
   } catch (error) {
     if (error instanceof Error) {

@@ -5,7 +5,7 @@ export async function createArtigoController(request: FastifyRequest, reply: Fas
   try {
     const { subambienteId } = request.params as any;
     const createData = request.body as any;
-    const artigo = await artigoService.createArtigo(subambienteId, createData);
+    const artigo = await artigoService.createArtigo(Number(subambienteId), createData);
     reply.status(201).send(artigo);
   } catch (error) {
     if (error instanceof Error) {
@@ -20,7 +20,7 @@ export async function updateArtigoController(request: FastifyRequest, reply: Fas
   try {
     const { id } = request.params as any;
     const updateData = request.body as any;
-    const artigo = await artigoService.updateArtigo(id, updateData);
+    const artigo = await artigoService.updateArtigo(Number(id), updateData);
     reply.status(200).send(artigo);
   } catch (error) {
     if (error instanceof Error) {
@@ -34,7 +34,7 @@ export async function updateArtigoController(request: FastifyRequest, reply: Fas
 export async function deleteArtigoController(request: FastifyRequest, reply: FastifyReply) {
   try {
     const { id } = request.params as any;
-    const result = await artigoService.deleteArtigo(id);
+    const result = await artigoService.deleteArtigo(Number(id));
     reply.status(200).send(result);
   } catch (error) {
     if (error instanceof Error) {
@@ -48,7 +48,7 @@ export async function deleteArtigoController(request: FastifyRequest, reply: Fas
 export async function listArtigosController(request: FastifyRequest, reply: FastifyReply) {
   try {
     const { subambienteId } = request.params as any;
-    const artigos = await artigoService.listArtigos(subambienteId);
+    const artigos = await artigoService.listArtigos(Number(subambienteId));
     reply.status(200).send(artigos);
   } catch (error) {
     if (error instanceof Error) {
@@ -62,7 +62,7 @@ export async function listArtigosController(request: FastifyRequest, reply: Fast
 export async function getArtigoController(request: FastifyRequest, reply: FastifyReply) {
   try {
     const { id } = request.params as any;
-    const artigo = await artigoService.getArtigo(id);
+    const artigo = await artigoService.getArtigo(Number(id));
     reply.status(200).send(artigo);
   } catch (error) {
     if (error instanceof Error) {

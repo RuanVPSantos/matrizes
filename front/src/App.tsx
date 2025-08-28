@@ -7,6 +7,8 @@ import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import ArtigoDetail from './pages/ArtigoDetail';
+import AmbienteDetail from './pages/AmbienteDetail';
+import SubambienteDetail from './pages/SubambienteDetail';
 import Favorites from './pages/Favorites';
 import AdminDashboard from './pages/AdminDashboard';
 
@@ -51,6 +53,8 @@ const AppRoutes: React.FC = () => {
             {/* Public routes */}
             <Route path="/" element={<Home />} />
             <Route path="/artigos/:id" element={<ArtigoDetail />} />
+            <Route path="/ambientes/:id" element={<AmbienteDetail />} />
+            <Route path="/ambientes/:ambienteId/subambientes/:subambienteId" element={<SubambienteDetail />} />
             
             {/* Auth routes */}
             <Route 

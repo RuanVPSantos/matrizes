@@ -34,7 +34,7 @@ export async function renewTokenController(request: FastifyRequest, reply: Fasti
     if (!request.user?.id) {
       return reply.status(401).send({ message: 'User not authenticated' });
     }
-    const token = await authService.renewToken(request.user.id);
+    const token = await authService.renewToken(Number(request.user.id));
     reply.status(200).send({ token });
   } catch (error) {
     if (error instanceof Error) {

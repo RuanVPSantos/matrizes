@@ -32,3 +32,12 @@ export async function listAmbientes() {
   const ambientes = await ambienteRepository.findAll();
   return ambientes.map(ambiente => ambiente.toResponse());
 }
+
+export async function listAmbientesById(id: number) {
+  const ambiente = await ambienteRepository.findById(id);
+  if (!ambiente) {
+    throw new Error("Ambiente not found");
+  }
+
+  return ambiente.toResponse();
+}

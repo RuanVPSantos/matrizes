@@ -17,7 +17,7 @@ export async function getAllUsersController(request: FastifyRequest, reply: Fast
 export async function getUserByIdController(request: FastifyRequest, reply: FastifyReply) {
   try {
     const { id } = request.params as any;
-    const user = await userService.getUserById(id);
+    const user = await userService.getUserById(Number(id));
     reply.status(200).send(user);
   } catch (error) {
     if (error instanceof Error) {
@@ -32,7 +32,7 @@ export async function updateUserController(request: FastifyRequest, reply: Fasti
   try {
     const { id } = request.params as any;
     const updateData = request.body as any;
-    const user = await userService.updateUser(id, updateData);
+    const user = await userService.updateUser(Number(id), updateData);
     reply.status(200).send(user);
   } catch (error) {
     if (error instanceof Error) {
@@ -46,7 +46,7 @@ export async function updateUserController(request: FastifyRequest, reply: Fasti
 export async function deleteUserController(request: FastifyRequest, reply: FastifyReply) {
   try {
     const { id } = request.params as any;
-    const result = await userService.deleteUser(id);
+    const result = await userService.deleteUser(Number(id));
     reply.status(200).send(result);
   } catch (error) {
     if (error instanceof Error) {
@@ -60,7 +60,7 @@ export async function deleteUserController(request: FastifyRequest, reply: Fasti
 export async function blockUserController(request: FastifyRequest, reply: FastifyReply) {
   try {
     const { id } = request.params as any;
-    const user = await userService.blockUser(id);
+    const user = await userService.blockUser(Number(id));
     reply.status(200).send(user);
   } catch (error) {
     if (error instanceof Error) {
@@ -74,7 +74,7 @@ export async function blockUserController(request: FastifyRequest, reply: Fastif
 export async function unblockUserController(request: FastifyRequest, reply: FastifyReply) {
   try {
     const { id } = request.params as any;
-    const user = await userService.unblockUser(id);
+    const user = await userService.unblockUser(Number(id));
     reply.status(200).send(user);
   } catch (error) {
     if (error instanceof Error) {

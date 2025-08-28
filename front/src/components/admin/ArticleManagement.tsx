@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { adminApi, publicApi } from '../../services/api';
 import { Ambiente, Subambiente, Artigo } from '../../types';
+import BlockEditor from './blocks/BlockEditor';
 
 const ArticleManagement: React.FC = () => {
   const [ambientes, setAmbientes] = useState<Ambiente[]>([]);
@@ -12,6 +13,8 @@ const ArticleManagement: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingArtigo, setEditingArtigo] = useState<Artigo | null>(null);
+  const [selectedArtigo, setSelectedArtigo] = useState<Artigo | null>(null);
+  const [showBlockEditor, setShowBlockEditor] = useState(false);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -122,6 +125,11 @@ const ArticleManagement: React.FC = () => {
       subambienteId: artigo.subambienteId.toString()
     });
     setIsModalOpen(true);
+  };
+
+  const handleEditBlocks = (artigo: Artigo) => {
+    setSelectedArtigo(artigo);
+    setShowBlockEditor(true);
   };
 
   const handleDelete = async (id: number) => {
@@ -248,6 +256,12 @@ const ArticleManagement: React.FC = () => {
                       Editar
                     </button>
                     <button
+                      onClick={() => handleEditBlocks(artigo)}
+                      className="text-green-600 hover:text-green-900"
+                    >
+                      Editar Conteúdo
+                    </button>
+                    <button
                       onClick={() => handleDelete(artigo.id)}
                       className="text-red-600 hover:text-red-900"
                     >
@@ -367,6 +381,30 @@ const ArticleManagement: React.FC = () => {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Block Editor Modal */}
+      {showBlockEditor && selectedArtigo && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
+            <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+              <h3 className="text-lg font-medium text-gray-900">
+                Editar Conteúdo: {selectedArtigo.title}
+              </h3>
+              <button
+                onClick={() => setShowBlockEditor(false)}
+                className="text-gray-400 hover:text-gray-500"
+              >
+                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <div className="overflow-y-auto flex-1 p-6">
+              <BlockEditor artigoId={selectedArtigo.id} />
+            </div>
           </div>
         </div>
       )}

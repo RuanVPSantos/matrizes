@@ -1,14 +1,14 @@
-import { 
-  mockHeaderData, 
-  mockAmbientes, 
-  mockSubambientes, 
-  mockArtigos, 
-  mockFavorites, 
+import {
+  mockHeaderData,
+  mockAmbientes,
+  mockSubambientes,
+  mockArtigos,
+  mockFavorites,
   mockAuthResponse,
   mockUsers,
   mockAdminUser
 } from '../data/mockData';
-import { AuthResponse, LoginRequest, RegisterRequest, HeaderData, Ambiente, Subambiente, Artigo, User } from '../types';
+import { AuthResponse, LoginRequest, RegisterRequest, HeaderData, Ambiente, Subambiente, Artigo, User, Block } from '../types';
 
 // Simulate API delay
 const delay = (ms: number = 500) => new Promise(resolve => setTimeout(resolve, ms));
@@ -19,27 +19,27 @@ export const mockApi = {
   auth: {
     login: async (data: LoginRequest): Promise<{ data: AuthResponse }> => {
       await delay();
-      
+
       // Simple mock validation
       if (data.email === 'admin@email.com' && data.password === 'admin123') {
-        return { 
-          data: { 
-            ...mockAdminUser, 
-            token: 'mock-admin-token-12345' 
-          } 
+        return {
+          data: {
+            ...mockAdminUser,
+            token: 'mock-admin-token-12345'
+          }
         };
       }
-      
+
       if (data.email === 'user@email.com' && data.password === 'user123') {
         return { data: mockAuthResponse };
       }
-      
+
       throw new Error('Credenciais inválidas');
     },
 
     register: async (data: RegisterRequest): Promise<{ data: AuthResponse }> => {
       await delay();
-      
+
       // Mock successful registration
       const newUser = {
         id: Date.now(),
@@ -51,7 +51,7 @@ export const mockApi = {
         updatedAt: new Date().toISOString(),
         token: `mock-token-${Date.now()}`
       };
-      
+
       return { data: newUser };
     },
 
@@ -71,6 +71,15 @@ export const mockApi = {
     getAmbientes: async (): Promise<{ data: Ambiente[] }> => {
       await delay();
       return { data: mockAmbientes };
+    },
+
+    getAmbiente: async (id: number): Promise<{ data: Ambiente }> => {
+      await delay();
+      const ambiente = mockAmbientes.find(a => a.id === id);
+      if (!ambiente) {
+        throw new Error('Ambiente não encontrado');
+      }
+      return { data: ambiente };
     },
 
     getSubambientes: async (ambienteId: number): Promise<{ data: Subambiente[] }> => {
@@ -144,7 +153,7 @@ export const mockApi = {
       await delay();
       const ambiente = mockAmbientes.find(a => a.id === id);
       if (!ambiente) throw new Error('Ambiente não encontrado');
-      
+
       const updated = { ...ambiente, ...data, updatedAt: new Date().toISOString() };
       return { data: updated };
     },
@@ -173,7 +182,7 @@ export const mockApi = {
       await delay();
       const subambiente = mockSubambientes.find(s => s.id === id);
       if (!subambiente) throw new Error('Subambiente não encontrado');
-      
+
       const updated = { ...subambiente, ...data, updatedAt: new Date().toISOString() };
       return { data: updated };
     },
@@ -202,7 +211,7 @@ export const mockApi = {
       await delay();
       const artigo = mockArtigos.find(a => a.id === id);
       if (!artigo) throw new Error('Artigo não encontrado');
-      
+
       const updated = { ...artigo, ...data, updatedAt: new Date().toISOString() };
       return { data: updated };
     },
@@ -211,42 +220,105 @@ export const mockApi = {
       await delay();
       return { data: { message: 'Artigo removido com sucesso' } };
     },
-    
+
+    // Blocos
+    createBloco: async (artigoId: number, data: Partial<Block>): Promise<{ data: Block }> => {
+      await delay();
+      const newBloco: Block = {
+        id: Date.now(),
+        type: data.type || 'TEXTO',
+        content: data.content || {
+          text: '',
+          style: {
+            fontSize: 'medium',
+            textAlign: 'left',
+            fontWeight: 'normal',
+            fontStyle: 'normal',
+            color: '#000000'
+          }
+        },
+        order: 0,
+        artigoId,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+      return { data: newBloco };
+    },
+
+    updateBloco: async (id: number, data: Partial<Block>): Promise<{ data: Block }> => {
+      await delay();
+      const updatedBloco: Block = {
+        id,
+        type: data.type || 'TEXTO',
+        content: data.content || {
+          text: '',
+          style: {
+            fontSize: 'medium',
+            textAlign: 'left',
+            fontWeight: 'normal',
+            fontStyle: 'normal',
+            color: '#000000'
+          }
+        },
+        order: data.order || 0,
+        artigoId: data.artigoId || 0,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+      return { data: updatedBloco };
+    },
+
+    deleteBloco: async (_id: number): Promise<{ data: { message: string } }> => {
+
+      await delay();
+      return { data: { message: 'Bloco removido com sucesso' } };
+    },
+
+    reorderBlocos: async (_artigoId: number, _orderList: number[]): Promise<{ data: { message: string } }> => {
+
+      await delay();
+      return { data: { message: 'Blocos reordenados com sucesso' } };
+    },
+
     // Usuários
     getUsers: async (): Promise<{ data: User[] }> => {
       await delay();
       // Return mock users
       return { data: mockUsers };
     },
-    
+
     updateUser: async (id: number, data: Partial<User>): Promise<{ data: User }> => {
       await delay();
       const user = mockUsers.find(u => u.id === id);
       if (!user) throw new Error('Usuário não encontrado');
-      
+
       const updated = { ...user, ...data, updatedAt: new Date().toISOString() };
       return { data: updated };
     },
-    
+
     deleteUser: async (id: number): Promise<{ data: { message: string } }> => {
       await delay();
+      const userIndex = mockUsers.findIndex(u => u.id === id);
+      if (userIndex === -1) throw new Error('Usuário não encontrado');
+
+      mockUsers.splice(userIndex, 1);
       return { data: { message: 'Usuário removido com sucesso' } };
     },
-    
+
     blockUser: async (id: number): Promise<{ data: User }> => {
       await delay();
       const user = mockUsers.find(u => u.id === id);
       if (!user) throw new Error('Usuário não encontrado');
-      
+
       const updated = { ...user, blocked: true, updatedAt: new Date().toISOString() };
       return { data: updated };
     },
-    
+
     unblockUser: async (id: number): Promise<{ data: User }> => {
       await delay();
       const user = mockUsers.find(u => u.id === id);
       if (!user) throw new Error('Usuário não encontrado');
-      
+
       const updated = { ...user, blocked: false, updatedAt: new Date().toISOString() };
       return { data: updated };
     }
