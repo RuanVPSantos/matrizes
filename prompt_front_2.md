@@ -279,8 +279,6 @@
     "alt": "Texto alternativo",
     "caption": "Legenda da imagem",
     "style": {
-      "width": "100%|50%|300px",
-      "height": "auto|200px",
       "textAlign": "left|center|right"
     }
   }
@@ -293,12 +291,7 @@
   "type": "VIDEO",
   "content": {
     "url": "https://example.com/video.mp4",
-    "title": "Título do vídeo",
-    "duration": "15:30",
-    "style": {
-      "width": "100%|50%|640px",
-      "height": "auto|360px"
-    }
+    "title": "Título do vídeo"
   }
 }
 ```
@@ -362,9 +355,7 @@
 - **Posicionamento** (esquerda, centro, direita)
 
 ### Para Blocos de Vídeo
-- **Player integrado** com controles
-- **Thumbnail** personalizada
-- **Informações** de duração
+- **Player attached** com iframe do youtube
 
 ### Navegação
 - **Breadcrumb** mostrando: Ambiente > Subambiente > Artigo
